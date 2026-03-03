@@ -13,14 +13,41 @@ management:
       exposure:
         include: '*'
 spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: anti-fraud-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: com.bank.antifraud.kafka.dto.SuspiciousTransferCommand
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   datasource:
     url: jdbc:postgresql://localhost:5433/postgres
     username: postgres
     password: password
   liquibase:
-    default-schema: anti_fraud
+    default-schema: public
     change-log: db/changelog/db.changelog-master.yaml
     enabled: ${LIQUIBASE_ENABLED:true}
     drop-first: ${LIQUIBASE_DROP_FIRST:false}
   application:
     name: anti-fraud-app
+logging:
+  level:
+    org.springframework.kafka: DEBUG
+    org.apache.kafka: INFO
+app:
+  kafka:
+    topics:
+      suspicious-create: suspicious-transfers.create
+      suspicious-update: suspicious-transfers.update
+      suspicious-delete: suspicious-transfers.delete
+      suspicious-get: suspicious-transfers.get
+      suspicious-get-reply: suspicious-transfers.get.reply
+
