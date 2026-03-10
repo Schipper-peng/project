@@ -8,6 +8,9 @@ import com.bank.antifraud.entity.SuspiciousCardTransfer;
 import com.bank.antifraud.entity.SuspiciousPhoneTransfer;
 import com.bank.antifraud.enums.TransferType;
 import com.bank.antifraud.kafka.dto.SuspiciousTransferCommand;
+import com.bank.antifraud.kafka.dto.SuspiciousTransferQuery;
+import com.bank.antifraud.kafka.dto.SuspiciousTransferResponse;
+import com.bank.antifraud.kafka.dto.SuspiciousTransferViewDto;
 import com.bank.antifraud.mappers.SuspiciousAccountTransferMapper;
 import com.bank.antifraud.mappers.SuspiciousCardTransferMapper;
 import com.bank.antifraud.mappers.SuspiciousPhoneTransferMapper;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -39,6 +43,7 @@ public class SuspiciousTransferServiceImpl implements  SuspiciousTransferService
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     private final AuditService auditService;
+    private final FraudAnalyzer fraudAnalyzer;
 
 
     public SuspiciousCardTransferDto upsertCard(SuspiciousCardTransferDto dto) {
@@ -95,96 +100,95 @@ public class SuspiciousTransferServiceImpl implements  SuspiciousTransferService
 
     @Override
     public void handleDelete(SuspiciousTransferCommand cmd) {
-        if (cmd == null || cmd.getTransferType() == null || cmd.getTransferId() == null) {
-            throw new IllegalArgumentException("Invalid delete command");
-        }
+        validateDeleteCommand(cmd);
         switch (cmd.getTransferType()) {
             case CARD -> cardRepository.deleteByCardTransferId(cmd.getTransferId());
             case PHONE -> phoneRepository.deleteByPhoneTransferId(cmd.getTransferId());
             case ACCOUNT -> accountRepository.deleteByAccountTransferId(cmd.getTransferId());
-            default -> throw new IllegalArgumentException("Unsupported transfer type");
+            default -> throw new IllegalArgumentException("Unsupported transfer type" + cmd.getTransferType());
         }
     }
 
     private void handleUpsert(SuspiciousTransferCommand cmd) {
+        validateUpsertCommand(cmd);
+
+        FraudDecision decision = fraudAnalyzer.analyze(cmd.getAmount());
+
+        switch (cmd.getTransferType()) {
+            case CARD -> upsertCard(buildCardDto(cmd, decision));
+            case PHONE -> upsertPhone(buildPhoneDto(cmd, decision));
+            case ACCOUNT -> upsertAccount(buildAccountDto(cmd, decision));
+            default -> throw new IllegalArgumentException("Unsupported transfer type" + cmd.getTransferType());
+        }
+    }
+    private void validateUpsertCommand(SuspiciousTransferCommand cmd) {
         if (cmd == null) {
             throw new IllegalArgumentException("Suspicious Transfer Command is required");
-        }
-        if (cmd.getTransferType() == null) {
+        } if (cmd.getTransferType() == null) {
             throw new IllegalArgumentException("Transfer Type is required");
         }
         if (cmd.getTransferId() == null) {
             throw new IllegalArgumentException("Transfer Id is required");
-        }
-
-        BigDecimal amount = cmd.getAmount();
-        boolean blocked = false;
-        boolean suspicious = false;
-        String blockedReason = null;
-        String suspiciousReason = null;
-
-        if (amount != null) {
-            if (amount.compareTo(BLOCK_THRESHOLD) > 0) {
-                blocked = true;
-                blockedReason = "Amount > " + BLOCK_THRESHOLD;
-                suspiciousReason = "NOT_SUSPICIOUS";
-            } else if (amount.compareTo(SUSPICIOUS_THRESHOLD) > 0) {
-                suspicious = true;
-                suspiciousReason = "Amount > " + SUSPICIOUS_THRESHOLD;
-                blockedReason = "NOT_BLOCKED";
-            } else {
-                blockedReason = "NOT_BLOCKED";
-                suspiciousReason = "NOT_SUSPICIOUS";
-            }
-        }
-        switch (cmd.getTransferType()) {
-            case CARD -> {
-                SuspiciousCardTransferDto dto = new SuspiciousCardTransferDto();
-                dto.setCardTransferId(cmd.getTransferId());
-                dto.setIsBlocked(blocked);
-                dto.setIsSuspicious(suspicious);
-                dto.setBlockedReason(blockedReason);
-                dto.setSuspiciousReason(suspiciousReason);
-                upsertCard(dto);
-            }
-            case PHONE -> {
-                SuspiciousPhoneTransferDto dto = new SuspiciousPhoneTransferDto();
-                dto.setPhoneTransferId(cmd.getTransferId());
-                dto.setIsBlocked(blocked);
-                dto.setIsSuspicious(suspicious);
-                dto.setBlockedReason(blockedReason);
-                dto.setSuspiciousReason(suspiciousReason);
-                upsertPhone(dto);
-            }
-            case ACCOUNT -> {
-                SuspiciousAccountTransferDto dto = new SuspiciousAccountTransferDto();
-                dto.setAccountTransferId(cmd.getTransferId());
-                dto.setIsBlocked(blocked);
-                dto.setIsSuspicious(suspicious);
-                dto.setBlockedReason(blockedReason);
-                dto.setSuspiciousReason(suspiciousReason);
-                upsertAccount(dto);
-            }
-            default -> throw new IllegalArgumentException("Unsupported Transfer Type: " + cmd.getTransferType());
+        } if (cmd.getAmount() == null) {
+            throw new IllegalArgumentException("Amount is required");
         }
     }
-    public void handleGet(SuspiciousTransferCommand cmd) {
-        if (cmd == null || cmd.getReplyTopic() == null || cmd.getCorrelationId() == null) {
-            throw new IllegalArgumentException("GET cmd must contain replyTopic and correlationId");
+    private void validateDeleteCommand(SuspiciousTransferCommand cmd) {
+        if (cmd == null) {
+            throw new IllegalArgumentException("Delete Command is required");
+        } if (cmd.getTransferType() == null) {
+            throw new IllegalArgumentException("Transfer Type is required");
+        } if (cmd.getTransferId() == null) {
+            throw new IllegalArgumentException("Transfer Id is required");
+        }
+    }
+    private SuspiciousCardTransferDto buildCardDto(SuspiciousTransferCommand cmd, FraudDecision decision) {
+        SuspiciousCardTransferDto dto = new SuspiciousCardTransferDto();
+        dto.setCardTransferId(cmd.getTransferId());
+        dto.setIsBlocked(decision.isBlocked());
+        dto.setIsSuspicious(decision.isSuspicious());
+        dto.setBlockedReason(decision.getBlockedReason().name());
+        dto.setSuspiciousReason(decision.getSuspiciousReason().name());
+        return dto;
+    }
+
+    private SuspiciousPhoneTransferDto buildPhoneDto(SuspiciousTransferCommand cmd, FraudDecision decision) {
+        SuspiciousPhoneTransferDto dto = new SuspiciousPhoneTransferDto();
+        dto.setPhoneTransferId(cmd.getTransferId());
+        dto.setIsBlocked(decision.isBlocked());
+        dto.setIsSuspicious(decision.isSuspicious());
+        dto.setBlockedReason(decision.getBlockedReason().name());
+        dto.setSuspiciousReason(decision.getSuspiciousReason().name());
+        return dto;
+    }
+
+    private SuspiciousAccountTransferDto buildAccountDto(SuspiciousTransferCommand cmd, FraudDecision decision) {
+        SuspiciousAccountTransferDto dto = new SuspiciousAccountTransferDto();
+        dto.setAccountTransferId(cmd.getTransferId());
+        dto.setIsBlocked(decision.isBlocked());
+        dto.setIsSuspicious(decision.isSuspicious());
+        dto.setBlockedReason(decision.getBlockedReason().name());
+        dto.setSuspiciousReason(decision.getSuspiciousReason().name());
+        return dto;
+    }
+
+    public void handleGet(SuspiciousTransferQuery query) {
+        if (query == null || query.getReplyTopic() == null || query.getCorrelationId() == null) {
+            throw new IllegalArgumentException("GET query must contain replyTopic and correlationId");
         }
 
         List<SuspiciousTransferViewDto> result = new ArrayList<>();
 
-        cardRepo.findAllByIsSuspiciousTrueOrIsBlockedTrue().forEach(e -> result.add(mapCard(e)));
-        phoneRepo.findAllByIsSuspiciousTrueOrIsBlockedTrue().forEach(e -> result.add(mapPhone(e)));
-        accountRepo.findAllByIsSuspiciousTrueOrIsBlockedTrue().forEach(e -> result.add(mapAccount(e)));
+        cardRepository.findAllByIsSuspiciousTrueOrIsBlockedTrue().forEach(e -> result.add(mapCard(e)));
+        phoneRepository.findAllByIsSuspiciousTrueOrIsBlockedTrue().forEach(e -> result.add(mapPhone(e)));
+        accountRepository.findAllByIsSuspiciousTrueOrIsBlockedTrue().forEach(e -> result.add(mapAccount(e)));
 
-        SuspiciousTransfersGetResponse response = SuspiciousTransfersGetResponse.builder()
-                .correlationId(cmd.getCorrelationId())
+        SuspiciousTransferResponse response = SuspiciousTransferResponse.builder()
+                .correlationId(query.getCorrelationId())
                 .transfers(result)
                 .build();
 
-        kafkaTemplate.send(cmd.getReplyTopic(), cmd.getCorrelationId(), response);
+        kafkaTemplate.send(query.getReplyTopic(), query.getCorrelationId(), response);
     }
 
     private SuspiciousTransferViewDto mapCard(SuspiciousCardTransfer e) {

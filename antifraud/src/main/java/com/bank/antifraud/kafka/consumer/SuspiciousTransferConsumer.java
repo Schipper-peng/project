@@ -2,6 +2,7 @@ package com.bank.antifraud.kafka.consumer;
 
 import com.bank.antifraud.kafka.KafkaTopics;
 import com.bank.antifraud.kafka.dto.SuspiciousTransferCommand;
+import com.bank.antifraud.kafka.dto.SuspiciousTransferQuery;
 import com.bank.antifraud.service.SuspiciousTransferService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,25 +15,28 @@ import org.springframework.stereotype.Service;
 public class SuspiciousTransferConsumer {
     private final SuspiciousTransferService service;
 
-    @KafkaListener(
-            topics = "${app.kafka.topics.suspicious-transfer-command}",
-            groupId = "${spring.kafka.consumer.group-id}",
-            containerFactory = "kafkaListenerContainerFactory"
-    )
-
-    public void listen(SuspiciousTransferCommand command) {
-        log.info("Received SuspiciousTransferCommand: {}", command);
-
-        switch (command.getOperationType()) {
-            case CREATE -> service.handleCreate(command);
-            case UPDATE -> service.handleUpdate(command);
-            case DELETE -> service.handleDelete(command);
-            default -> throw new IllegalArgumentException("Invalid operation type" + command.getOperationType());
-        }
+    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.create}")
+    public void consumeCreate(SuspiciousTransferCommand command) {
+        log.info("Received CREATE command: {}", command);
+        service.handleCreate(command);
     }
 
+    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.update}")
+    public void consumeUpdate(SuspiciousTransferCommand command) {
+        log.info("Received UPDATE command: {}", command);
+        service.handleUpdate(command);
+    }
 
-    @KafkaListener(topics = KafkaTopics.GET)
-    public void onGet(String json) {}
+    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.delete}")
+    public void consumeDelete(SuspiciousTransferCommand command) {
+        log.info("Received DELETE command: {}", command);
+        service.handleDelete(command);
+    }
+
+    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.get}")
+    public void consumeGet(SuspiciousTransferQuery query) {
+        log.info("Received GET query: {}", query);
+        service.handleGet(query);
+    }
 
 }

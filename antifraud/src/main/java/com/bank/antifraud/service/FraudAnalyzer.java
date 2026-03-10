@@ -9,10 +9,14 @@ import java.math.BigDecimal;
 @Component
 public class FraudAnalyzer {
 
-    private static final BigDecimal BLOCK_THRESHOLD = new BigDecimal("500000");
-    private static final BigDecimal SUSPICIOUS_THRESHOLD = new BigDecimal("100000");
+    private static final BigDecimal BLOCK_THRESHOLD = BigDecimal.valueOf(500_000);
+    private static final BigDecimal SUSPICIOUS_THRESHOLD = BigDecimal.valueOf(100_000);
 
     public FraudDecision analyze(BigDecimal amount) {
+
+        if (amount == null) {
+            throw new IllegalArgumentException("Amount must not be null");
+        }
 
         if (amount.compareTo(BLOCK_THRESHOLD) > 0) {
             return new FraudDecision(

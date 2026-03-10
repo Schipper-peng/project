@@ -4,7 +4,6 @@ import com.bank.antifraud.dto.AuditDto;
 import com.bank.antifraud.entity.Audit;
 import org.springframework.stereotype.Component;
 
-@Component
 public final class AuditMapper {
     private AuditMapper() {}
 
@@ -12,7 +11,6 @@ public final class AuditMapper {
         if (audit == null) return null;
 
         AuditDto auditDto = new AuditDto();
-        auditDto.setId(audit.getId());
         auditDto.setEntityType(audit.getEntityType());
         auditDto.setOperationType(audit.getOperationType());
         auditDto.setCreatedBy(audit.getCreatedBy());
@@ -26,7 +24,6 @@ public final class AuditMapper {
     public static Audit toEntity(AuditDto auditDto) {
         if (auditDto == null) return null;
         Audit audit = new Audit();
-        audit.setId(auditDto.getId());
         audit.setEntityType(auditDto.getEntityType());
         audit.setOperationType(auditDto.getOperationType());
         audit.setCreatedBy(auditDto.getCreatedBy());

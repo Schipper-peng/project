@@ -45,9 +45,11 @@ logging:
 app:
   kafka:
     topics:
-      suspicious-create: suspicious-transfers.create
-      suspicious-update: suspicious-transfers.update
-      suspicious-delete: suspicious-transfers.delete
-      suspicious-get: suspicious-transfers.get
-      suspicious-get-reply: suspicious-transfers.get.reply
+      suspicious-transfers:
+        create: suspicious-transfers.create
+        update: suspicious-transfers.update
+        delete: suspicious-transfers.delete
+        get: suspicious-transfers.get
+        get-reply: suspicious-transfers.get.reply
+      audit: suspicious-transfers.audit
 

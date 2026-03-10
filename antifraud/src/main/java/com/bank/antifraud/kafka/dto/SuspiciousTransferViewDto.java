@@ -1,19 +1,20 @@
 package com.bank.antifraud.kafka.dto;
 
-import com.bank.antifraud.enums.OperationType;
 import com.bank.antifraud.enums.TransferType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SuspiciousTransferQuery {
-    private String correlationId;
-    private String replyTopic;
+public class SuspiciousTransferViewDto {
+    private TransferType transferType;
+    private Long transferId;
+    private boolean isBlocked;
+    private boolean isSuspicious;
+    private String blockedReason;
+    private String suspiciousReason;
 }
