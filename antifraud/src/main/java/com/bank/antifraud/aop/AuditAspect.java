@@ -1,7 +1,6 @@
-package com.bank.antifraud.auditLogging;
+package com.bank.antifraud.aop;
 
 import com.bank.antifraud.dto.AuditDto;
-import com.bank.antifraud.enums.OperationType;
 import com.bank.antifraud.kafka.dto.SuspiciousTransferCommand;
 import com.bank.antifraud.repository.SuspiciousAccountTransferRepository;
 import com.bank.antifraud.repository.SuspiciousCardTransferRepository;
@@ -17,8 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-
-import static com.bank.antifraud.enums.OperationType.UPDATE;
 
 @Aspect
 @Component
@@ -95,5 +92,5 @@ public class AuditAspect {
         }
         return authentication.getName();
     }
-    }
-//}
+
+}
