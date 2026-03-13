@@ -1,5 +1,10 @@
 package com.bank.antifraud.enums;
 
 public enum OperationType {
-    CREATE, UPDATE, DELETE, GET;
+    CREATE,
+    UPDATE,
+    DELETE,
+    GET,
+    AUDIT;
+
 }

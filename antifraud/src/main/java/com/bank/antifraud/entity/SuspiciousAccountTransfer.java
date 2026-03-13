@@ -12,11 +12,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class SuspiciousAccountTransfer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "account_transfer_id",  nullable = false,  unique = true)
+    @Column(name = "account_transfer_id", nullable = false, unique = true)
     private Long accountTransferId;
 
     @Column(name = "is_blocked")
@@ -33,4 +34,5 @@ public class SuspiciousAccountTransfer {
 
     public SuspiciousAccountTransfer(Long accountTransferId) {
     }
+
 }

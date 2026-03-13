@@ -15,6 +15,7 @@ import com.bank.antifraud.mappers.SuspiciousAccountTransferMapper;
 import com.bank.antifraud.mappers.SuspiciousCardTransferMapper;
 import com.bank.antifraud.mappers.SuspiciousPhoneTransferMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import com.bank.antifraud.repository.SuspiciousAccountTransferRepository;
@@ -26,37 +27,41 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class SuspiciousTransferServiceImpl implements  SuspiciousTransferService {
+public class SuspiciousTransferServiceImpl implements SuspiciousTransferService {
 
     private final SuspiciousAccountTransferRepository accountRepository;
     private final SuspiciousCardTransferRepository cardRepository;
     private final SuspiciousPhoneTransferRepository phoneRepository;
-
     private final SuspiciousCardTransferMapper cardMapper;
     private final SuspiciousAccountTransferMapper accountMapper;
     private final SuspiciousPhoneTransferMapper phoneMapper;
-
     private final KafkaTemplate<String, Object> kafkaTemplate;
-
-    private final AuditService auditService;
     private final FraudAnalyzer fraudAnalyzer;
 
-
     public SuspiciousCardTransferDto upsertCard(SuspiciousCardTransferDto dto) {
-        if (dto.getCardTransferId() == null) {
-            throw new IllegalArgumentException("Card Transfer Id is required");
+        if (dto == null || dto.getCardTransferId() == null) {
+            throw new IllegalArgumentException("Card transfer id is required");
         }
-        SuspiciousCardTransfer entity = cardRepository.findByCardTransferId(dto.getCardTransferId())
-                .map(existing -> {
-                    cardMapper.apply(dto, existing);
-                    return existing;
-                })
-                .orElseGet(() -> cardMapper.toEntity(dto));
+
+        log.info("Upserting CARD transfer: transferId={}", dto.getCardTransferId());
+
+        SuspiciousCardTransfer entity = cardRepository.findByCardTransferId(dto.getCardTransferId()).map(existing -> {
+            log.info("CARD transfer found, updating existing entity: transferId={}", dto.getCardTransferId());
+            cardMapper.apply(dto, existing);
+            return existing;
+        }).orElseGet(() -> {
+            log.info("CARD transfer not found, creating new entity: transferId={}", dto.getCardTransferId());
+            return cardMapper.toEntity(dto);
+        });
+
         SuspiciousCardTransfer saved = cardRepository.save(entity);
+
+        log.info("CARD transfer saved: transferId={}, blocked={}, suspicious={}", saved.getCardTransferId(), saved.getIsBlocked(), saved.getIsSuspicious());
+
         return cardMapper.toDto(saved);
     }
 
@@ -64,13 +69,22 @@ public class SuspiciousTransferServiceImpl implements  SuspiciousTransferService
         if (dto.getPhoneTransferId() == null) {
             throw new IllegalArgumentException("Phone Transfer Id is required");
         }
-        SuspiciousPhoneTransfer entity = phoneRepository.findByPhoneTransferId(dto.getPhoneTransferId())
-                .map(existing -> {
-                    phoneMapper.apply(dto, existing);
-                    return existing;
-                })
-                .orElseGet(() -> phoneMapper.toEntity(dto));
+
+        log.info("Upserting PHONE transfer: transferId={}", dto.getPhoneTransferId());
+
+        SuspiciousPhoneTransfer entity = phoneRepository.findByPhoneTransferId(dto.getPhoneTransferId()).map(existing -> {
+            log.info("Phone transfer found, updating existing entity: transferId={}", dto.getPhoneTransferId());
+            phoneMapper.apply(dto, existing);
+            return existing;
+        }).orElseGet(() -> {
+            log.info("Phone transfer not found, creating new entity: transferId={}", dto.getPhoneTransferId());
+            return phoneMapper.toEntity(dto);
+        });
+
         SuspiciousPhoneTransfer saved = phoneRepository.save(entity);
+
+        log.info("Phone transfer saved: transferId={}, blocked={}, suspicious={}", saved.getPhoneTransferId(), saved.getIsBlocked(), saved.getIsSuspicious());
+
         return phoneMapper.toDto(saved);
     }
 
@@ -78,13 +92,22 @@ public class SuspiciousTransferServiceImpl implements  SuspiciousTransferService
         if (dto.getAccountTransferId() == null) {
             throw new IllegalArgumentException("Account Transfer Id is required");
         }
-        SuspiciousAccountTransfer entity = accountRepository.findByAccountTransferId(dto.getAccountTransferId())
-                .map(existing -> {
-                    accountMapper.apply(dto, existing);
-                    return existing;
-                })
-                .orElseGet(() -> accountMapper.toEntity(dto));
+
+        log.info("Upserting ACCOUNT transfer: transferId={}", dto.getAccountTransferId());
+
+        SuspiciousAccountTransfer entity = accountRepository.findByAccountTransferId(dto.getAccountTransferId()).map(existing -> {
+            log.info("ACCOUNT transfer found, updating existing entity: transferId={}", dto.getAccountTransferId());
+            accountMapper.apply(dto, existing);
+            return existing;
+        }).orElseGet(() -> {
+            log.info("ACCOUNT transfer not found, creating new entity: transferId={}", dto.getAccountTransferId());
+            return accountMapper.toEntity(dto);
+        });
+
         SuspiciousAccountTransfer saved = accountRepository.save(entity);
+
+        log.info("ACCOUNT transfer saved: transferId={}, blocked={}, suspicious={}", saved.getAccountTransferId(), saved.getIsBlocked(), saved.getIsSuspicious());
+
         return accountMapper.toDto(saved);
     }
 
@@ -95,12 +118,17 @@ public class SuspiciousTransferServiceImpl implements  SuspiciousTransferService
 
     @Override
     public void handleUpdate(SuspiciousTransferCommand cmd) {
+        log.info("Handling UPDATE command: transferType={}, transferId={}, amount={}", cmd != null ? cmd.getTransferType() : null, cmd != null ? cmd.getTransferId() : null, cmd != null ? cmd.getAmount() : null);
+
         handleUpsert(cmd);
     }
 
     @Override
     public void handleDelete(SuspiciousTransferCommand cmd) {
+        log.info("Handling DELETE command: transferType={}, transferId={}", cmd != null ? cmd.getTransferType() : null, cmd != null ? cmd.getTransferId() : null);
+
         validateDeleteCommand(cmd);
+
         switch (cmd.getTransferType()) {
             case CARD -> cardRepository.deleteByCardTransferId(cmd.getTransferId());
             case PHONE -> phoneRepository.deleteByPhoneTransferId(cmd.getTransferId());
@@ -112,7 +140,11 @@ public class SuspiciousTransferServiceImpl implements  SuspiciousTransferService
     private void handleUpsert(SuspiciousTransferCommand cmd) {
         validateUpsertCommand(cmd);
 
+        log.info("Validated UPSERT command: transferType={}, transferId={}, amount={}", cmd.getTransferType(), cmd.getTransferId(), cmd.getAmount());
+
         FraudDecision decision = fraudAnalyzer.analyze(cmd.getAmount());
+
+        log.info("Fraud decision calculated: transferType={}, transferId={}, blocked={}, suspicious={}, blockedReason={}, suspiciousReason={}", cmd.getTransferType(), cmd.getTransferId(), decision.isBlocked(), decision.isSuspicious(), decision.getBlockedReason(), decision.getSuspiciousReason());
 
         switch (cmd.getTransferType()) {
             case CARD -> upsertCard(buildCardDto(cmd, decision));
@@ -121,27 +153,46 @@ public class SuspiciousTransferServiceImpl implements  SuspiciousTransferService
             default -> throw new IllegalArgumentException("Unsupported transfer type" + cmd.getTransferType());
         }
     }
+
     private void validateUpsertCommand(SuspiciousTransferCommand cmd) {
         if (cmd == null) {
             throw new IllegalArgumentException("Suspicious Transfer Command is required");
-        } if (cmd.getTransferType() == null) {
+        }
+        if (cmd.getTransferType() == null) {
             throw new IllegalArgumentException("Transfer Type is required");
         }
         if (cmd.getTransferId() == null) {
             throw new IllegalArgumentException("Transfer Id is required");
-        } if (cmd.getAmount() == null) {
+        }
+        if (cmd.getAmount() == null) {
             throw new IllegalArgumentException("Amount is required");
         }
     }
+
     private void validateDeleteCommand(SuspiciousTransferCommand cmd) {
         if (cmd == null) {
             throw new IllegalArgumentException("Delete Command is required");
-        } if (cmd.getTransferType() == null) {
+        }
+        if (cmd.getTransferType() == null) {
             throw new IllegalArgumentException("Transfer Type is required");
-        } if (cmd.getTransferId() == null) {
+        }
+        if (cmd.getTransferId() == null) {
             throw new IllegalArgumentException("Transfer Id is required");
         }
     }
+
+    private void validateGetQuery(SuspiciousTransferQuery query) {
+        if (query == null) {
+            throw new IllegalArgumentException("GET query is required");
+        }
+        if (query.getReplyTopic() == null || query.getReplyTopic().isBlank()) {
+            throw new IllegalArgumentException("Reply topic is required");
+        }
+        if (query.getCorrelationId() == null || query.getCorrelationId().isBlank()) {
+            throw new IllegalArgumentException("Correlation id is required");
+        }
+    }
+
     private SuspiciousCardTransferDto buildCardDto(SuspiciousTransferCommand cmd, FraudDecision decision) {
         SuspiciousCardTransferDto dto = new SuspiciousCardTransferDto();
         dto.setCardTransferId(cmd.getTransferId());
@@ -173,9 +224,9 @@ public class SuspiciousTransferServiceImpl implements  SuspiciousTransferService
     }
 
     public void handleGet(SuspiciousTransferQuery query) {
-        if (query == null || query.getReplyTopic() == null || query.getCorrelationId() == null) {
-            throw new IllegalArgumentException("GET query must contain replyTopic and correlationId");
-        }
+        log.info("Handling GET query: correlationId={}, replyTopic={}", query != null ? query.getCorrelationId() : null, query != null ? query.getReplyTopic() : null);
+
+        validateGetQuery(query);
 
         List<SuspiciousTransferViewDto> result = new ArrayList<>();
 
@@ -183,44 +234,21 @@ public class SuspiciousTransferServiceImpl implements  SuspiciousTransferService
         phoneRepository.findAllByIsSuspiciousTrueOrIsBlockedTrue().forEach(e -> result.add(mapPhone(e)));
         accountRepository.findAllByIsSuspiciousTrueOrIsBlockedTrue().forEach(e -> result.add(mapAccount(e)));
 
-        SuspiciousTransferResponse response = SuspiciousTransferResponse.builder()
-                .correlationId(query.getCorrelationId())
-                .transfers(result)
-                .build();
+        SuspiciousTransferResponse response = SuspiciousTransferResponse.builder().correlationId(query.getCorrelationId()).transfers(result).build();
 
         kafkaTemplate.send(query.getReplyTopic(), query.getCorrelationId(), response);
     }
 
     private SuspiciousTransferViewDto mapCard(SuspiciousCardTransfer e) {
-        return SuspiciousTransferViewDto.builder()
-                .transferType(TransferType.CARD)
-                .transferId(e.getCardTransferId())
-                .isBlocked(e.getIsBlocked())
-                .isSuspicious(e.getIsSuspicious())
-                .blockedReason(e.getBlockedReason())
-                .suspiciousReason(e.getSuspiciousReason())
-                .build();
+        return SuspiciousTransferViewDto.builder().transferType(TransferType.CARD).transferId(e.getCardTransferId()).isBlocked(e.getIsBlocked()).isSuspicious(e.getIsSuspicious()).blockedReason(e.getBlockedReason()).suspiciousReason(e.getSuspiciousReason()).build();
     }
 
     private SuspiciousTransferViewDto mapPhone(SuspiciousPhoneTransfer e) {
-        return SuspiciousTransferViewDto.builder()
-                .transferType(TransferType.PHONE)
-                .transferId(e.getPhoneTransferId())
-                .isBlocked(e.getIsBlocked())
-                .isSuspicious(e.getIsSuspicious())
-                .blockedReason(e.getBlockedReason())
-                .suspiciousReason(e.getSuspiciousReason())
-                .build();
+        return SuspiciousTransferViewDto.builder().transferType(TransferType.PHONE).transferId(e.getPhoneTransferId()).isBlocked(e.getIsBlocked()).isSuspicious(e.getIsSuspicious()).blockedReason(e.getBlockedReason()).suspiciousReason(e.getSuspiciousReason()).build();
     }
 
     private SuspiciousTransferViewDto mapAccount(SuspiciousAccountTransfer e) {
-        return SuspiciousTransferViewDto.builder()
-                .transferType(TransferType.ACCOUNT)
-                .transferId(e.getAccountTransferId())
-                .isBlocked(e.getIsBlocked())
-                .isSuspicious(e.getIsSuspicious())
-                .blockedReason(e.getBlockedReason())
-                .suspiciousReason(e.getSuspiciousReason())
-                .build();
+        return SuspiciousTransferViewDto.builder().transferType(TransferType.ACCOUNT).transferId(e.getAccountTransferId()).isBlocked(e.getIsBlocked()).isSuspicious(e.getIsSuspicious()).blockedReason(e.getBlockedReason()).suspiciousReason(e.getSuspiciousReason()).build();
     }
+
 }

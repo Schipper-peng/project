@@ -9,6 +9,7 @@ import lombok.Getter;
 public class FraudDecision {
     private final boolean isBlocked;
     private final boolean isSuspicious;
-    private final FraudReason blockedReason ;
+    private final FraudReason blockedReason;
     private final FraudReason suspiciousReason;
+
 }

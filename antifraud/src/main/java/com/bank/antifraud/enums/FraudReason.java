@@ -8,4 +8,5 @@ public enum FraudReason {
     AMOUNT_OVER_SUSPICIOUS_THRESHOLD,
     NOT_BLOCKED,
     NOT_SUSPICIOUS;
+
 }

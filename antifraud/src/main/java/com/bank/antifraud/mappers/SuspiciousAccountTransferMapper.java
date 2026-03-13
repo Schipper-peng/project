@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SuspiciousAccountTransferMapper {
+
     public SuspiciousAccountTransfer toEntity(SuspiciousAccountTransferDto dto) {
         if (dto == null) return null;
 
@@ -22,6 +23,7 @@ public class SuspiciousAccountTransferMapper {
         entity.setBlockedReason(dto.getBlockedReason());
         entity.setSuspiciousReason(dto.getSuspiciousReason());
     }
+
     public SuspiciousAccountTransferDto toDto(SuspiciousAccountTransfer entity) {
         if (entity == null) return null;
         SuspiciousAccountTransferDto dto = new SuspiciousAccountTransferDto();
@@ -32,4 +34,5 @@ public class SuspiciousAccountTransferMapper {
         dto.setSuspiciousReason(entity.getSuspiciousReason());
         return dto;
     }
+
 }

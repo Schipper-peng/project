@@ -2,10 +2,10 @@ package com.bank.antifraud.kafka.dto;
 
 import com.bank.antifraud.enums.OperationType;
 import com.bank.antifraud.enums.TransferType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -14,6 +14,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class SuspiciousTransferQuery {
+
+    @NotBlank
     private String correlationId;
+
+    @NotBlank
     private String replyTopic;
+
 }

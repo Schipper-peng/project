@@ -7,16 +7,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="suspicious_card_transfer")
+@Table(name = "suspicious_card_transfer")
 @Getter
 @Setter
 @NoArgsConstructor
 public class SuspiciousCardTransfer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "card_transfer_id",  nullable = false,  unique = true)
+    @Column(name = "card_transfer_id", nullable = false, unique = true)
     private Long cardTransferId;
 
     @Column(name = "is_blocked")
@@ -31,7 +32,7 @@ public class SuspiciousCardTransfer {
     @Column(name = "suspicious_reason")
     private String suspiciousReason;
 
-
     public SuspiciousCardTransfer(Long cardTransferId) {
     }
+
 }

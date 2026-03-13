@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,10 +15,10 @@ import java.time.Instant;
 @Entity
 @Table(name = "audit")
 public class Audit {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(name = "entity_type")
     private String entityType;
 
@@ -43,4 +44,5 @@ public class Audit {
     @Lob
     @Column(name = "entity_json", nullable = false)
     private String entityJson;
+
 }

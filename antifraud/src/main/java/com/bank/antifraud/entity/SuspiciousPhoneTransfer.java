@@ -7,15 +7,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="suspicious_phone_transfer")
-@Getter @Setter
+@Table(name = "suspicious_phone_transfers")
+@Getter
+@Setter
 @NoArgsConstructor
 public class SuspiciousPhoneTransfer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "phone_transfer_id",  nullable = false,  unique = true)
+    @Column(name = "phone_transfer_id", nullable = false, unique = true)
     private Long phoneTransferId;
 
     @Column(name = "is_blocked")
@@ -30,8 +32,7 @@ public class SuspiciousPhoneTransfer {
     @Column(name = "suspicious_reason")
     private String suspiciousReason;
 
-
     public SuspiciousPhoneTransfer(Long phoneTransferId) {
-
     }
+
 }

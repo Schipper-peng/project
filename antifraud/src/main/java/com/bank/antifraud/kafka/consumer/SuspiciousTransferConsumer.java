@@ -15,25 +15,33 @@ import org.springframework.stereotype.Service;
 public class SuspiciousTransferConsumer {
     private final SuspiciousTransferService service;
 
-    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.create}")
+    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.create}",
+            containerFactory = "kafkaListenerContainerFactory"
+    )
     public void consumeCreate(SuspiciousTransferCommand command) {
         log.info("Received CREATE command: {}", command);
         service.handleCreate(command);
     }
 
-    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.update}")
+    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.update}",
+            containerFactory = "kafkaListenerContainerFactory"
+    )
     public void consumeUpdate(SuspiciousTransferCommand command) {
         log.info("Received UPDATE command: {}", command);
         service.handleUpdate(command);
     }
 
-    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.delete}")
+    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.delete}",
+            containerFactory = "kafkaListenerContainerFactory"
+    )
     public void consumeDelete(SuspiciousTransferCommand command) {
         log.info("Received DELETE command: {}", command);
         service.handleDelete(command);
     }
 
-    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.get}")
+    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.get}",
+            containerFactory = "kafkaListenerContainerFactory"
+    )
     public void consumeGet(SuspiciousTransferQuery query) {
         log.info("Received GET query: {}", query);
         service.handleGet(query);

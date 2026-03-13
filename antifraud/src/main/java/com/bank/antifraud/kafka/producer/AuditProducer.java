@@ -13,6 +13,7 @@ public class AuditProducer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public void send(AuditDto auditDto) {
-        kafkaTemplate.send(KafkaTopics.AUDIT, auditDto.getEntityType(), auditDto);
+        kafkaTemplate.send(KafkaTopics.AUDIT, String.valueOf(auditDto.getEntityType()), auditDto);
     }
+
 }

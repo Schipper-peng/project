@@ -1,5 +1,6 @@
 package com.bank.antifraud.kafka.dto;
 
+import com.bank.antifraud.enums.TransferType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class SuspiciousTransferResponse {
+
     private String correlationId;
     private List<SuspiciousTransferViewDto> transfers;
+
 }

@@ -1,6 +1,7 @@
 package com.bank.antifraud.kafka.consumer;
 
 import com.bank.antifraud.dto.AuditDto;
+import com.bank.antifraud.entity.Audit;
 import com.bank.antifraud.mappers.AuditMapper;
 import com.bank.antifraud.repository.AuditRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +14,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuditConsumer {
     private final AuditRepository auditRepository;
+    private final AuditMapper auditMapper;
 
-    @KafkaListener(topics = "${app.kafka.topics.audit}")
+    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.audit}")
     public void consume(AuditDto auditDto) {
-        log.info("Received audit event: {}", auditDto);
-        auditRepository.save(AuditMapper.toEntity(auditDto));
+        log.info("Received audit : {}", auditDto);
+
+        Audit audit = auditMapper.toEntity(auditDto);
+        auditRepository.save(audit);
+
+        log.info("Audit event saved successfully");
     }
+
 }

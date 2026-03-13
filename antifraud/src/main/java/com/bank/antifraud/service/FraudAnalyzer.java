@@ -43,4 +43,5 @@ public class FraudAnalyzer {
                 FraudReason.NOT_SUSPICIOUS
         );
     }
+
 }

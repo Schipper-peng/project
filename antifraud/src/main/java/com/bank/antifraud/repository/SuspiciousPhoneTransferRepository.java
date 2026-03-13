@@ -6,9 +6,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+
 @Repository
 public interface SuspiciousPhoneTransferRepository extends JpaRepository<SuspiciousPhoneTransfer, Long> {
+
     Optional<SuspiciousPhoneTransfer> findByPhoneTransferId(Long phoneTransferId);
+
     void deleteByPhoneTransferId(Long phoneTransferId);
+
     List<SuspiciousPhoneTransfer> findAllByIsSuspiciousTrueOrIsBlockedTrue();
+
 }

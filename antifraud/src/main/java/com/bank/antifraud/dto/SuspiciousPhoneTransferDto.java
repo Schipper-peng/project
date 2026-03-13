@@ -8,10 +8,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SuspiciousPhoneTransferDto{
+public class SuspiciousPhoneTransferDto {
+
     private Long phoneTransferId;
+
     private Boolean isBlocked;
+
     private Boolean isSuspicious;
+
     private String blockedReason;
+
     private String suspiciousReason;
+
 }
