@@ -1,6 +1,5 @@
 package com.bank.antifraud.kafka.consumer;
 
-import com.bank.antifraud.kafka.KafkaTopics;
 import com.bank.antifraud.kafka.dto.SuspiciousTransferCommand;
 import com.bank.antifraud.kafka.dto.SuspiciousTransferQuery;
 import com.bank.antifraud.service.SuspiciousTransferService;

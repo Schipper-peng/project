@@ -16,7 +16,10 @@ public class AuditConsumer {
     private final AuditRepository auditRepository;
     private final AuditMapper auditMapper;
 
-    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.audit}")
+    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.audit}",
+            containerFactory = "kafkaListenerContainerFactory"
+    )
+
     public void consume(AuditDto auditDto) {
         log.info("Received audit : {}", auditDto);
 

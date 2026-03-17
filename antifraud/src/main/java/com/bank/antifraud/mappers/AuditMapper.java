@@ -11,7 +11,7 @@ public final class AuditMapper {
     private AuditMapper() {
     }
 
-    public static AuditDto toDto(Audit audit) {
+    public AuditDto toDto(Audit audit) {
         if (audit == null) return null;
 
         AuditDto auditDto = new AuditDto();
@@ -26,7 +26,7 @@ public final class AuditMapper {
         return auditDto;
     }
 
-    public static Audit toEntity(AuditDto auditDto) {
+    public Audit toEntity(AuditDto auditDto) {
         if (auditDto == null) return null;
         Audit audit = new Audit();
         audit.setEntityType(String.valueOf(auditDto.getEntityType()));

@@ -5,6 +5,6 @@ public enum OperationType {
     UPDATE,
     DELETE,
     GET,
-    AUDIT;
+    AUDIT
 
 }

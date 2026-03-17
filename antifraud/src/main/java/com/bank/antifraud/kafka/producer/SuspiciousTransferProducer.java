@@ -27,6 +27,13 @@ public class SuspiciousTransferProducer {
             case DELETE -> KafkaTopics.DELETE;
             default -> throw new IllegalArgumentException("Invalid operation type " + command.getOperationType());
         };
+
+        log.info("Sending command to topic={}, operationType={}, transferType={}, transferId={}",
+                topic,
+                command.getOperationType(),
+                command.getTransferType(),
+                command.getTransferId());
+
         kafkaTemplate.send(
                 topic,
                 command.getTransferId() == null ? null : command.getTransferId().toString(),

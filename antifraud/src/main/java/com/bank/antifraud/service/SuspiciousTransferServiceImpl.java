@@ -23,7 +23,6 @@ import com.bank.antifraud.repository.SuspiciousCardTransferRepository;
 import com.bank.antifraud.repository.SuspiciousPhoneTransferRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 

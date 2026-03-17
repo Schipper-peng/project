@@ -1,6 +1,5 @@
 package com.bank.antifraud.entity;
 
-import com.bank.antifraud.enums.FraudReason;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

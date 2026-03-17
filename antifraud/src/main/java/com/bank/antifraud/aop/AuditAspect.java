@@ -3,16 +3,17 @@ package com.bank.antifraud.aop;
 import com.bank.antifraud.dto.AuditDto;
 import com.bank.antifraud.enums.TransferType;
 import com.bank.antifraud.kafka.dto.SuspiciousTransferCommand;
+import com.bank.antifraud.kafka.producer.AuditProducer;
 import com.bank.antifraud.repository.SuspiciousAccountTransferRepository;
 import com.bank.antifraud.repository.SuspiciousCardTransferRepository;
 import com.bank.antifraud.repository.SuspiciousPhoneTransferRepository;
 import com.bank.antifraud.service.AuditService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.hibernate.sql.Update;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -22,13 +23,14 @@ import java.time.Instant;
 import static com.bank.antifraud.enums.OperationType.CREATE;
 import static com.bank.antifraud.enums.OperationType.UPDATE;
 
+@Slf4j
 @Aspect
 @Component
 @RequiredArgsConstructor
 public class AuditAspect {
 
     private final AuditService auditService;
-    private final ObjectMapper objectMapper;
+    private final AuditProducer auditProducer;
     private final SuspiciousAccountTransferRepository accountRepository;
     private final SuspiciousCardTransferRepository cardRepository;
     private final SuspiciousPhoneTransferRepository phoneRepository;
