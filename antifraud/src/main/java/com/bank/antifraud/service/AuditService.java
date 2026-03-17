@@ -5,8 +5,9 @@ import com.bank.antifraud.enums.TransferType;
 
 public interface AuditService {
 
-    void send(AuditDto auditDto);
-    public AuditDto fromCreate(TransferType transferType, Object createdEntity, String createdBy);
-    public AuditDto fromUpdate(TransferType transferType, Object before, Object after, String modifiedBy);
+
+    AuditDto fromCreate(TransferType transferType, Object createdEntity, String createdBy);
+
+    AuditDto fromUpdate(TransferType transferType, Object before, Object after, String modifiedBy);
 
 }

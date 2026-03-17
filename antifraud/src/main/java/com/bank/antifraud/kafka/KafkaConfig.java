@@ -1,7 +1,5 @@
 package com.bank.antifraud.kafka;
 
-import com.bank.antifraud.kafka.dto.SuspiciousTransferCommand;
-import com.bank.antifraud.kafka.exception.AntifraudExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -13,14 +11,14 @@ import org.springframework.kafka.listener.CommonErrorHandler;
 @EnableKafka
 public class KafkaConfig {
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, SuspiciousTransferCommand> kafkaListenerContainerFactory(
-            ConsumerFactory<String, SuspiciousTransferCommand> consumerFactory,
-            AntifraudExceptionHandler exceptionHandler
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
+            ConsumerFactory<String, Object> consumerFactory,
+            CommonErrorHandler kafkaErrorHandler
     ) {
-        var factory = new ConcurrentKafkaListenerContainerFactory<String, SuspiciousTransferCommand>();
+        ConcurrentKafkaListenerContainerFactory<String, Object>  factory = new ConcurrentKafkaListenerContainerFactory<>();
 
         factory.setConsumerFactory(consumerFactory);
-        factory.setCommonErrorHandler((CommonErrorHandler) exceptionHandler);
+        factory.setCommonErrorHandler(kafkaErrorHandler);
 
         return factory;
     }

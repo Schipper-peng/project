@@ -7,9 +7,7 @@ import com.bank.antifraud.enums.TransferType;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class AuditMapper {
-    private AuditMapper() {
-    }
+public class AuditMapper {
 
     public AuditDto toDto(Audit audit) {
         if (audit == null) return null;

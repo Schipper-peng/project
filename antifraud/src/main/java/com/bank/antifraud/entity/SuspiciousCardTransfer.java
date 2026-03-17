@@ -1,15 +1,15 @@
 package com.bank.antifraud.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+@Builder
 @Entity
 @Table(name = "suspicious_card_transfer")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class SuspiciousCardTransfer {
 
     @Id

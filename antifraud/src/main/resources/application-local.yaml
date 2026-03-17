@@ -51,5 +51,5 @@ app:
         delete: suspicious-transfers.delete
         get: suspicious-transfers.get
         get-reply: suspicious-transfers.get.reply
-      audit: suspicious-transfers.audit
+      audit: audit-events
 

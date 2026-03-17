@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -16,10 +17,10 @@ public class AuditConsumer {
     private final AuditRepository auditRepository;
     private final AuditMapper auditMapper;
 
-    @KafkaListener(topics = "${app.kafka.topics.suspicious-transfers.audit}",
+    @KafkaListener(topics = "${app.kafka.topics.audit}",
             containerFactory = "kafkaListenerContainerFactory"
     )
-
+    @Transactional
     public void consume(AuditDto auditDto) {
         log.info("Received audit : {}", auditDto);
 

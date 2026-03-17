@@ -2,9 +2,10 @@ package com.bank.antifraud.service;
 
 import com.bank.antifraud.enums.FraudReason;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 
-@Getter
+@Data
 @AllArgsConstructor
 public class FraudDecision {
     private final boolean isBlocked;

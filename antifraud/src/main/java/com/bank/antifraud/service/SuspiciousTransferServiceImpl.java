@@ -11,6 +11,7 @@ import com.bank.antifraud.kafka.dto.SuspiciousTransferCommand;
 import com.bank.antifraud.kafka.dto.SuspiciousTransferQuery;
 import com.bank.antifraud.kafka.dto.SuspiciousTransferResponse;
 import com.bank.antifraud.kafka.dto.SuspiciousTransferViewDto;
+import com.bank.antifraud.kafka.producer.SuspiciousTransferProducer;
 import com.bank.antifraud.mappers.SuspiciousAccountTransferMapper;
 import com.bank.antifraud.mappers.SuspiciousCardTransferMapper;
 import com.bank.antifraud.mappers.SuspiciousPhoneTransferMapper;
@@ -38,7 +39,7 @@ public class SuspiciousTransferServiceImpl implements SuspiciousTransferService 
     private final SuspiciousCardTransferMapper cardMapper;
     private final SuspiciousAccountTransferMapper accountMapper;
     private final SuspiciousPhoneTransferMapper phoneMapper;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final SuspiciousTransferProducer producer;
     private final FraudAnalyzer fraudAnalyzer;
 
     public SuspiciousCardTransferDto upsertCard(SuspiciousCardTransferDto dto) {
@@ -235,7 +236,10 @@ public class SuspiciousTransferServiceImpl implements SuspiciousTransferService 
 
         SuspiciousTransferResponse response = SuspiciousTransferResponse.builder().correlationId(query.getCorrelationId()).transfers(result).build();
 
-        kafkaTemplate.send(query.getReplyTopic(), query.getCorrelationId(), response);
+        producer.sendReply(query.getReplyTopic(),
+                query.getCorrelationId(),
+                response
+        );
     }
 
     private SuspiciousTransferViewDto mapCard(SuspiciousCardTransfer e) {

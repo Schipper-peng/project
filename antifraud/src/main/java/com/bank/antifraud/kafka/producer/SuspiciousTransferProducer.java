@@ -4,13 +4,14 @@ package com.bank.antifraud.kafka.producer;
 import com.bank.antifraud.kafka.KafkaTopics;
 import com.bank.antifraud.kafka.dto.SuspiciousTransferCommand;
 import com.bank.antifraud.kafka.dto.SuspiciousTransferQuery;
+import com.bank.antifraud.kafka.dto.SuspiciousTransferResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 @Slf4j
-@Service
+@Component
 @RequiredArgsConstructor
 public class SuspiciousTransferProducer {
 
@@ -45,8 +46,28 @@ public class SuspiciousTransferProducer {
         if (query == null) {
             throw new IllegalArgumentException("Query cant be null");
         }
+        log.info("Sending GET query to topic={}, correlationId={}",
+                KafkaTopics.GET,
+                query.getCorrelationId());
+
         kafkaTemplate.send(KafkaTopics.GET, query.getCorrelationId(), query);
     }
+    public void sendReply(String replyTopic, String correlationId, SuspiciousTransferResponse response) {
+        if (replyTopic == null || replyTopic.isBlank()) {
+            throw new IllegalArgumentException("Reply topic can't be null or blank");
+        }
+        if (correlationId == null || correlationId.isBlank()) {
+            throw new IllegalArgumentException("Correlation id can't be null or blank");
+        }
+        if (response == null) {
+            throw new IllegalArgumentException("Response can't be null");
+        }
 
+        log.info("Sending reply to topic={}, correlationId={}, transfersCount={}",
+                replyTopic, correlationId,
+                response.getTransfers() == null ? 0 : response.getTransfers().size());
+
+        kafkaTemplate.send(replyTopic, correlationId, response);
+    }
 }
 
