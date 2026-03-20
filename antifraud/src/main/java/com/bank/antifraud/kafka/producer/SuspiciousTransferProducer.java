@@ -8,11 +8,9 @@ import com.bank.antifraud.kafka.BaseKafkaSupport;
 import com.bank.antifraud.kafka.KafkaHeader;
 import com.bank.antifraud.kafka.KafkaTopics;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;

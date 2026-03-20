@@ -1,6 +1,5 @@
 package com.bank.antifraud.kafka;
 
-import com.bank.antifraud.kafka.KafkaHeader;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.header.Header;

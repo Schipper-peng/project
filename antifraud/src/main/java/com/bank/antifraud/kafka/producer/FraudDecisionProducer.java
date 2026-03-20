@@ -1,7 +1,6 @@
 package com.bank.antifraud.kafka.producer;
 
 import com.bank.antifraud.dto.analysis.FraudDecisionDto;
-import com.bank.antifraud.enums.TransferType;
 import com.bank.antifraud.kafka.BaseKafkaSupport;
 import com.bank.antifraud.kafka.KafkaHeader;
 import com.bank.antifraud.kafka.KafkaTopics;

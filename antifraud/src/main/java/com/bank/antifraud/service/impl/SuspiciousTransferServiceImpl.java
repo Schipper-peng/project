@@ -1,7 +1,6 @@
 package com.bank.antifraud.service.impl;
 
 import com.bank.antifraud.aop.Auditable;
-import com.bank.antifraud.dto.analysis.FraudDecisionDto;
 import com.bank.antifraud.dto.suspicious.SuspiciousAccountTransferDto;
 import com.bank.antifraud.dto.suspicious.SuspiciousCardTransferDto;
 import com.bank.antifraud.dto.suspicious.SuspiciousPhoneTransferDto;
@@ -9,13 +8,11 @@ import com.bank.antifraud.entity.SuspiciousAccountTransfer;
 import com.bank.antifraud.entity.SuspiciousCardTransfer;
 import com.bank.antifraud.entity.SuspiciousPhoneTransfer;
 import com.bank.antifraud.enums.OperationType;
-import com.bank.antifraud.enums.TransferType;
 import com.bank.antifraud.kafka.producer.SuspiciousTransferProducer;
 import com.bank.antifraud.mappers.SuspiciousAccountTransferMapper;
 import com.bank.antifraud.mappers.SuspiciousCardTransferMapper;
 import com.bank.antifraud.mappers.SuspiciousPhoneTransferMapper;
 import com.bank.antifraud.service.SuspiciousTransferService;
-import com.bank.antifraud.service.TransferAnalyzer;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +22,6 @@ import com.bank.antifraud.repository.SuspiciousCardTransferRepository;
 import com.bank.antifraud.repository.SuspiciousPhoneTransferRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
