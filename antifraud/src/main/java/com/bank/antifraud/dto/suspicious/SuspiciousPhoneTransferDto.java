@@ -1,15 +1,17 @@
-package com.bank.antifraud.dto;
+package com.bank.antifraud.dto.suspicious;
 
+
+import com.bank.antifraud.enums.FraudReason;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class SuspiciousPhoneTransferDto {
+
+    private Long id;
 
     private Long phoneTransferId;
 
@@ -17,8 +19,8 @@ public class SuspiciousPhoneTransferDto {
 
     private Boolean isSuspicious;
 
-    private String blockedReason;
+    private FraudReason blockedReason;
 
-    private String suspiciousReason;
+    private FraudReason suspiciousReason;
 
 }

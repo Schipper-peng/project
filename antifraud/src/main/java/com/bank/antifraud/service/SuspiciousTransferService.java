@@ -1,16 +1,26 @@
 package com.bank.antifraud.service;
 
 
-import com.bank.antifraud.kafka.dto.SuspiciousTransferCommand;
-import com.bank.antifraud.kafka.dto.SuspiciousTransferQuery;
+import com.bank.antifraud.dto.suspicious.SuspiciousAccountTransferDto;
+import com.bank.antifraud.dto.suspicious.SuspiciousCardTransferDto;
+import com.bank.antifraud.dto.suspicious.SuspiciousPhoneTransferDto;
 
 public interface SuspiciousTransferService {
-    void handleCreate(SuspiciousTransferCommand cmd);
 
-    void handleUpdate(SuspiciousTransferCommand cmd);
+    SuspiciousAccountTransferDto createAccount(SuspiciousAccountTransferDto dto);
+    SuspiciousCardTransferDto createCard(SuspiciousCardTransferDto dto);
+    SuspiciousPhoneTransferDto createPhone(SuspiciousPhoneTransferDto dto);
 
-    void handleDelete(SuspiciousTransferCommand cmd);
+    SuspiciousAccountTransferDto updateAccount(SuspiciousAccountTransferDto dto);
+    SuspiciousCardTransferDto updateCard(SuspiciousCardTransferDto dto);
+    SuspiciousPhoneTransferDto updatePhone(SuspiciousPhoneTransferDto dto);
 
-    void handleGet(SuspiciousTransferQuery query);
+    void deleteAccount(Long id);
+    void deleteCard(Long id);
+    void deletePhone(Long id);
+
+    SuspiciousAccountTransferDto getAccount(Long id);
+    SuspiciousCardTransferDto getCard(Long id);
+    SuspiciousPhoneTransferDto getPhone(Long id);
 
 }

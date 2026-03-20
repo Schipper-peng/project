@@ -1,4 +1,4 @@
-package com.bank.antifraud.kafka.exception;
+package com.bank.antifraud.exception;
 
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.context.annotation.Bean;

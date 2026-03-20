@@ -1,36 +1,36 @@
 package com.bank.antifraud.kafka.producer;
 
-import com.bank.antifraud.dto.audit.AuditDto;
+import com.bank.antifraud.dto.analysis.FraudDecisionDto;
+import com.bank.antifraud.enums.TransferType;
 import com.bank.antifraud.kafka.BaseKafkaSupport;
 import com.bank.antifraud.kafka.KafkaHeader;
 import com.bank.antifraud.kafka.KafkaTopics;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Service
-public class AuditProducer extends BaseKafkaSupport {
-
+public class FraudDecisionProducer extends BaseKafkaSupport {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public AuditProducer(KafkaTemplate<String, String> kafkaTemplate, ObjectMapper objectMapper) {
+    public FraudDecisionProducer(KafkaTemplate<String, String> kafkaTemplate, ObjectMapper objectMapper) {
         super(objectMapper);
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendAudit(String key, AuditDto auditDto, String correlationId) {
+    public void sendDecision(FraudDecisionDto dto, String correlationId) {
         ProducerRecord<String, String> record =
-                new ProducerRecord<>(KafkaTopics.AUDIT, key, writeJson(auditDto));
+                new ProducerRecord<>(KafkaTopics.FRAUD_DECISION, String.valueOf(dto.getTransferId()), writeJson(dto));
+
+        record.headers().add(
+                KafkaHeader.TRANSFER_TYPE,
+                dto.getTransferType().name().getBytes(StandardCharsets.UTF_8)
+        );
 
         if (correlationId != null) {
             record.headers().add(
@@ -40,7 +40,7 @@ public class AuditProducer extends BaseKafkaSupport {
         }
 
         kafkaTemplate.send(record);
-        log.info("Audit message sent: key={}", key);
+        log.info("FraudDecision sent: transferId={}, transferType={}, suspicious={}",
+                dto.getTransferId(), dto.getTransferType(), dto.isSuspicious());
     }
-
 }

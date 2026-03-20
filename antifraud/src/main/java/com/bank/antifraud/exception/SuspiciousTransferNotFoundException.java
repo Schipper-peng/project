@@ -1,4 +1,4 @@
-package com.bank.antifraud.kafka.exception;
+package com.bank.antifraud.exception;
 
 public class SuspiciousTransferNotFoundException extends RuntimeException {
 

@@ -22,8 +22,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
-        spring.json.value.default.type: com.bank.antifraud.kafka.dto.SuspiciousTransferCommand
-
+        spring.json.use.type.headers: false
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -45,6 +44,10 @@ logging:
 app:
   kafka:
     topics:
+      transfer:
+        account: transfer.antifraud.account
+        card: transfer.antifraud.card
+        phone: transfer.antifraud.phone
       suspicious-transfers:
         create: suspicious-transfers.create
         update: suspicious-transfers.update

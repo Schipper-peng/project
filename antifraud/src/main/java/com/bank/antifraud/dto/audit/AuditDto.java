@@ -1,4 +1,4 @@
-package com.bank.antifraud.dto;
+package com.bank.antifraud.dto.audit;
 
 import com.bank.antifraud.enums.OperationType;
 import com.bank.antifraud.enums.TransferType;

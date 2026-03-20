@@ -1,6 +1,6 @@
 package com.bank.antifraud.mappers;
 
-import com.bank.antifraud.dto.AuditDto;
+import com.bank.antifraud.dto.audit.AuditDto;
 import com.bank.antifraud.entity.Audit;
 import com.bank.antifraud.enums.OperationType;
 import com.bank.antifraud.enums.TransferType;

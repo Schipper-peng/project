@@ -1,6 +1,6 @@
 package com.bank.antifraud.mappers;
 
-import com.bank.antifraud.dto.SuspiciousCardTransferDto;
+import com.bank.antifraud.dto.suspicious.SuspiciousCardTransferDto;
 import com.bank.antifraud.entity.SuspiciousCardTransfer;
 import org.springframework.stereotype.Component;
 
@@ -8,30 +8,31 @@ import org.springframework.stereotype.Component;
 public class SuspiciousCardTransferMapper {
 
     public SuspiciousCardTransfer toEntity(SuspiciousCardTransferDto dto) {
-        if (dto == null) return null;
-
-        SuspiciousCardTransfer entity = new SuspiciousCardTransfer();
-        entity.setCardTransferId(dto.getCardTransferId());
-        apply(dto, entity);
-        return entity;
-    }
-
-    public void apply(SuspiciousCardTransferDto dto, SuspiciousCardTransfer entity) {
-        entity.setIsBlocked(dto.getIsBlocked());
-        entity.setIsSuspicious(dto.getIsSuspicious());
-        entity.setBlockedReason(dto.getBlockedReason());
-        entity.setSuspiciousReason(dto.getSuspiciousReason());
+        if (dto == null) {
+            return null;
+        }
+        return SuspiciousCardTransfer.builder()
+                .id(dto.getId())
+                .cardTransferId(dto.getCardTransferId())
+                .isBlocked(dto.getIsBlocked())
+                .isSuspicious(dto.getIsSuspicious())
+                .blockedReason(dto.getBlockedReason())
+                .suspiciousReason(dto.getSuspiciousReason())
+                .build();
     }
 
     public SuspiciousCardTransferDto toDto(SuspiciousCardTransfer entity) {
-        if (entity == null) return null;
-        SuspiciousCardTransferDto dto = new SuspiciousCardTransferDto();
-        dto.setCardTransferId(entity.getCardTransferId());
-        dto.setIsBlocked(entity.getIsBlocked());
-        dto.setIsSuspicious(entity.getIsSuspicious());
-        dto.setBlockedReason(entity.getBlockedReason());
-        dto.setSuspiciousReason(entity.getSuspiciousReason());
-        return dto;
+        if (entity == null) {
+            return null;
+        }
+        return new SuspiciousCardTransferDto(
+                entity.getId(),
+                entity.getCardTransferId(),
+                entity.getIsBlocked(),
+                entity.getIsSuspicious(),
+                entity.getBlockedReason(),
+                entity.getSuspiciousReason()
+        );
     }
 
 }
