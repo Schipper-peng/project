@@ -21,6 +21,13 @@ public class SuspiciousPhoneTransferMapper {
                 .suspiciousReason(dto.getSuspiciousReason() != null ? dto.getSuspiciousReason().name() : null)
                 .build();
     }
+    public void updateEntityFromDto(SuspiciousPhoneTransferDto dto, SuspiciousPhoneTransfer entity) {
+        entity.setPhoneTransferId(dto.getPhoneTransferId());
+        entity.setIsBlocked(dto.getIsBlocked());
+        entity.setIsSuspicious(dto.getIsSuspicious());
+        entity.setBlockedReason(dto.getBlockedReason() != null ? dto.getBlockedReason().name() : null);
+        entity.setSuspiciousReason(dto.getSuspiciousReason() != null ? dto.getSuspiciousReason().name() : null);
+    }
 
     public SuspiciousPhoneTransferDto toDto(SuspiciousPhoneTransfer entity) {
         if (entity == null) {

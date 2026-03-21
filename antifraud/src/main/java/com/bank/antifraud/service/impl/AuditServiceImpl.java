@@ -5,6 +5,9 @@ import com.bank.antifraud.dto.suspicious.SuspiciousAccountTransferDto;
 import com.bank.antifraud.dto.suspicious.SuspiciousCardTransferDto;
 import com.bank.antifraud.dto.suspicious.SuspiciousPhoneTransferDto;
 import com.bank.antifraud.entity.Audit;
+import com.bank.antifraud.entity.SuspiciousAccountTransfer;
+import com.bank.antifraud.entity.SuspiciousCardTransfer;
+import com.bank.antifraud.entity.SuspiciousPhoneTransfer;
 import com.bank.antifraud.enums.OperationType;
 import com.bank.antifraud.enums.TransferType;
 import com.bank.antifraud.mappers.AuditMapper;
@@ -54,13 +57,16 @@ public class AuditServiceImpl implements AuditService {
     private TransferType resolveEntityType(Object before, Object after) {
         Object target = after != null ? after : before;
 
-        if (target instanceof SuspiciousAccountTransferDto) {
+        if (target instanceof SuspiciousAccountTransfer
+                || target instanceof SuspiciousAccountTransferDto) {
             return TransferType.ACCOUNT;
         }
-        if (target instanceof SuspiciousCardTransferDto) {
+        if (target instanceof SuspiciousCardTransfer
+                || target instanceof SuspiciousCardTransferDto) {
             return TransferType.CARD;
         }
-        if (target instanceof SuspiciousPhoneTransferDto) {
+        if (target instanceof SuspiciousPhoneTransfer
+                || target instanceof SuspiciousPhoneTransferDto) {
             return TransferType.PHONE;
         }
         throw new IllegalArgumentException("Unsupported audit entity type: " + target);

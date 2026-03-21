@@ -22,6 +22,14 @@ public class SuspiciousCardTransferMapper {
                 .build();
     }
 
+    public void updateEntityFromDto(SuspiciousCardTransferDto dto, SuspiciousCardTransfer entity) {
+        entity.setCardTransferId(dto.getCardTransferId());
+        entity.setIsBlocked(dto.getIsBlocked());
+        entity.setIsSuspicious(dto.getIsSuspicious());
+        entity.setBlockedReason(dto.getBlockedReason() != null ? dto.getBlockedReason().name() : null);
+        entity.setSuspiciousReason(dto.getSuspiciousReason() != null ? dto.getSuspiciousReason().name() : null);
+    }
+
     public SuspiciousCardTransferDto toDto(SuspiciousCardTransfer entity) {
         if (entity == null) {
             return null;

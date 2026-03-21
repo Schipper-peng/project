@@ -14,6 +14,7 @@ import com.bank.antifraud.kafka.producer.FraudDecisionProducer;
 import com.bank.antifraud.kafka.producer.SuspiciousTransferProducer;
 import com.bank.antifraud.service.TransferAnalyzer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -22,33 +23,26 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-public class TransferConsumer extends BaseKafkaSupport {
+@RequiredArgsConstructor
+public class TransferConsumer{
     private final TransferAnalyzer transferAnalyzer;
     private final SuspiciousTransferProducer suspiciousTransferProducer;
     private final FraudDecisionProducer fraudDecisionProducer;
 
-    public TransferConsumer(TransferAnalyzer transferAnalyzer,
-                            SuspiciousTransferProducer suspiciousTransferProducer,
-                            FraudDecisionProducer fraudDecisionProducer,
-                            ObjectMapper objectMapper) {
-        super(objectMapper);
-        this.transferAnalyzer = transferAnalyzer;
-        this.suspiciousTransferProducer = suspiciousTransferProducer;
-        this.fraudDecisionProducer = fraudDecisionProducer;
-    }
 
 
-
-    @KafkaListener(topics = KafkaTopics.ACCOUNT_TRANSFER, groupId = "${spring.kafka.consumer.group-id}")
-    public void handleAccount(String payload) {
+    @KafkaListener(topics = KafkaTopics.ACCOUNT_TRANSFER,
+            groupId = "${spring.kafka.consumer.group-id}",
+            containerFactory = "accountTransferKafkaListenerContainerFactory"
+    )
+    public void handleAccount(AccountTransferDto dto) {
         String corrId = UUID.randomUUID().toString();
-        AccountTransferDto dto = readJson(payload, AccountTransferDto.class);
 
         FraudDecisionDto decision = transferAnalyzer.analyzeAccount(dto);
 
         fraudDecisionProducer.sendDecision(decision, corrId);
 
-        if (Boolean.TRUE.equals(decision.isSuspicious())) {
+        if (decision.isSuspicious()) {
             suspiciousTransferProducer.sendCreate(
                     new SuspiciousAccountTransferDto(
                             null,
@@ -67,16 +61,18 @@ public class TransferConsumer extends BaseKafkaSupport {
                 dto.getAccountTransferId(), decision.isSuspicious());
     }
 
-    @KafkaListener(topics = KafkaTopics.CARD_TRANSFER, groupId = "${spring.kafka.consumer.group-id}")
-    public void handleCard(String payload) {
+    @KafkaListener(topics = KafkaTopics.CARD_TRANSFER,
+            groupId = "${spring.kafka.consumer.group-id}",
+            containerFactory = "cardTransferKafkaListenerContainerFactory"
+    )
+    public void handleCard(CardTransferDto dto) {
         String corrId = UUID.randomUUID().toString();
-        CardTransferDto dto = readJson(payload, CardTransferDto.class);
 
         FraudDecisionDto decision = transferAnalyzer.analyzeCard(dto);
 
         fraudDecisionProducer.sendDecision(decision, corrId);
 
-        if (Boolean.TRUE.equals(decision.isSuspicious())) {
+        if (decision.isSuspicious()) {
             suspiciousTransferProducer.sendCreate(
                     new SuspiciousCardTransferDto(
                             null,
@@ -95,16 +91,18 @@ public class TransferConsumer extends BaseKafkaSupport {
                 dto.getCardTransferId(), decision.isSuspicious());
     }
 
-    @KafkaListener(topics = KafkaTopics.PHONE_TRANSFER, groupId = "${spring.kafka.consumer.group-id}")
-    public void handlePhone(String payload) {
+    @KafkaListener(topics = KafkaTopics.PHONE_TRANSFER,
+            groupId = "${spring.kafka.consumer.group-id}",
+            containerFactory = "phoneTransferKafkaListenerContainerFactory"
+    )
+    public void handlePhone(PhoneTransferDto dto) {
         String corrId = UUID.randomUUID().toString();
-        PhoneTransferDto dto = readJson(payload, PhoneTransferDto.class);
 
         FraudDecisionDto decision = transferAnalyzer.analyzePhone(dto);
 
         fraudDecisionProducer.sendDecision(decision, corrId);
 
-        if (Boolean.TRUE.equals(decision.isSuspicious())) {
+        if (decision.isSuspicious()) {
             suspiciousTransferProducer.sendCreate(
                     new SuspiciousPhoneTransferDto(
                             null,

@@ -23,6 +23,14 @@ public class SuspiciousAccountTransferMapper {
                 .build();
     }
 
+    public void updateEntityFromDto(SuspiciousAccountTransferDto dto, SuspiciousAccountTransfer entity) {
+        entity.setAccountTransferId(dto.getAccountTransferId());
+        entity.setIsBlocked(dto.getIsBlocked());
+        entity.setIsSuspicious(dto.getIsSuspicious());
+        entity.setBlockedReason(dto.getBlockedReason() != null ? dto.getBlockedReason().name() : null);
+        entity.setSuspiciousReason(dto.getSuspiciousReason() != null ? dto.getSuspiciousReason().name() : null);
+    }
+
     public SuspiciousAccountTransferDto toDto(SuspiciousAccountTransfer entity) {
         if (entity == null) {
             return null;

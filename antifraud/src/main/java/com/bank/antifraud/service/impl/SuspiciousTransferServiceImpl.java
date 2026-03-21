@@ -35,43 +35,37 @@ public class SuspiciousTransferServiceImpl implements SuspiciousTransferService 
     private final SuspiciousCardTransferMapper cardMapper;
     private final SuspiciousAccountTransferMapper accountMapper;
     private final SuspiciousPhoneTransferMapper phoneMapper;
-    private final SuspiciousTransferProducer producer;
-
 
 
     @Override
     @Auditable(OperationType.CREATE)
     public SuspiciousAccountTransferDto createAccount(SuspiciousAccountTransferDto dto) {
-        SuspiciousAccountTransfer entity = accountMapper.toEntity(dto);
-        return accountMapper.toDto(accountRepository.save(entity));
+        SuspiciousAccountTransfer saved = accountRepository.save(accountMapper.toEntity(dto));
+        return accountMapper.toDto(saved);
     }
 
     @Override
     @Auditable(OperationType.CREATE)
     public SuspiciousCardTransferDto createCard(SuspiciousCardTransferDto dto) {
-        SuspiciousCardTransfer entity = cardMapper.toEntity(dto);
-        return cardMapper.toDto(cardRepository.save(entity));
+        SuspiciousCardTransfer saved = cardRepository.save(cardMapper.toEntity(dto));
+        return cardMapper.toDto(saved);
     }
 
     @Override
     @Auditable(OperationType.CREATE)
     public SuspiciousPhoneTransferDto createPhone(SuspiciousPhoneTransferDto dto) {
-        SuspiciousPhoneTransfer entity = phoneMapper.toEntity(dto);
-        return phoneMapper.toDto(phoneRepository.save(entity));
+        SuspiciousPhoneTransfer saved = phoneRepository.save(phoneMapper.toEntity(dto));
+        return phoneMapper.toDto(saved);
     }
 
     @Override
     @Auditable(OperationType.UPDATE)
     public SuspiciousAccountTransferDto updateAccount(SuspiciousAccountTransferDto dto) {
         SuspiciousAccountTransfer entity = accountRepository.findById(dto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("SuspiciousAccountTransfer not found: " + dto.getId()));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "SuspiciousAccountTransfer not found: " + dto.getId()));
 
-        entity.setAccountTransferId(dto.getAccountTransferId());
-        entity.setIsBlocked(dto.getIsBlocked());
-        entity.setIsSuspicious(dto.getIsSuspicious());
-        entity.setBlockedReason(dto.getBlockedReason());
-        entity.setSuspiciousReason(dto.getSuspiciousReason());
-
+        accountMapper.updateEntityFromDto(dto, entity);
         return accountMapper.toDto(accountRepository.save(entity));
     }
 
@@ -79,10 +73,10 @@ public class SuspiciousTransferServiceImpl implements SuspiciousTransferService 
     @Auditable(OperationType.UPDATE)
     public SuspiciousCardTransferDto updateCard(SuspiciousCardTransferDto dto) {
         SuspiciousCardTransfer entity = cardRepository.findById(dto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("SuspiciousCardTransfer not found: " + dto.getId()));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "SuspiciousCardTransfer not found: " + dto.getId()));
 
-        cardMapper.toEntity(dto, entity);
-
+        cardMapper.updateEntityFromDto(dto, entity);
         return cardMapper.toDto(cardRepository.save(entity));
     }
 
@@ -90,14 +84,10 @@ public class SuspiciousTransferServiceImpl implements SuspiciousTransferService 
     @Auditable(OperationType.UPDATE)
     public SuspiciousPhoneTransferDto updatePhone(SuspiciousPhoneTransferDto dto) {
         SuspiciousPhoneTransfer entity = phoneRepository.findById(dto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("SuspiciousPhoneTransfer not found: " + dto.getId()));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "SuspiciousPhoneTransfer not found: " + dto.getId()));
 
-        entity.setPhoneTransferId(dto.getPhoneTransferId());
-        entity.setIsBlocked(dto.getIsBlocked());
-        entity.setIsSuspicious(dto.getIsSuspicious());
-        entity.setBlockedReason(dto.getBlockedReason());
-        entity.setSuspiciousReason(dto.getSuspiciousReason());
-
+        phoneMapper.updateEntityFromDto(dto, entity);
         return phoneMapper.toDto(phoneRepository.save(entity));
     }
 
@@ -129,20 +119,23 @@ public class SuspiciousTransferServiceImpl implements SuspiciousTransferService 
     @Transactional(readOnly = true)
     public SuspiciousAccountTransferDto getAccount(Long id) {
         return accountMapper.toDto(accountRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("SuspiciousAccountTransfer not found: " + id)));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "SuspiciousAccountTransfer not found: " + id)));
     }
 
     @Override
     @Transactional(readOnly = true)
     public SuspiciousCardTransferDto getCard(Long id) {
         return cardMapper.toDto(cardRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("SuspiciousCardTransfer not found: " + id)));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "SuspiciousCardTransfer not found: " + id)));
     }
 
     @Override
     @Transactional(readOnly = true)
     public SuspiciousPhoneTransferDto getPhone(Long id) {
         return phoneMapper.toDto(phoneRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("SuspiciousPhoneTransfer not found: " + id)));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "SuspiciousPhoneTransfer not found: " + id)));
     }
 }

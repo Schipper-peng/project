@@ -1,30 +1,107 @@
 package com.bank.antifraud.kafka;
 
+import com.bank.antifraud.dto.suspicious.SuspiciousAccountTransferDto;
+import com.bank.antifraud.dto.transfer.AccountTransferDto;
+import com.bank.antifraud.dto.transfer.CardTransferDto;
+import com.bank.antifraud.dto.transfer.PhoneTransferDto;
+import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.boot.ssl.SslBundles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
+@RequiredArgsConstructor
 public class KafkaConfig {
+
+    private final KafkaProperties kafkaProperties;
+    private final SslBundles sslBundles;
+
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory(
-            ConcurrentKafkaListenerContainerFactoryConfigurer configurer,
-            ConsumerFactory<Object, Object> consumerFactory) {
+    public DefaultErrorHandler kafkaErrorHandler() {
+        return new DefaultErrorHandler(new FixedBackOff(2000L, 2L));
+    }
 
-        ConcurrentKafkaListenerContainerFactory<Object, Object> factory =
+    @Bean
+    public ConsumerFactory<String, AccountTransferDto> accountTransferConsumerFactory() {
+        return new DefaultKafkaConsumerFactory<String, AccountTransferDto>(
+                baseConsumerProps(),
+                new StringDeserializer(),
+                jsonDeserializer(AccountTransferDto.class)
+        );
+    }
+
+    @Bean
+    public ConsumerFactory<String, CardTransferDto> cardTransferConsumerFactory() {
+        return new DefaultKafkaConsumerFactory<String, CardTransferDto>(
+                baseConsumerProps(),
+                new StringDeserializer(),
+                jsonDeserializer(CardTransferDto.class)
+        );
+    }
+
+    @Bean
+    public ConsumerFactory<String, PhoneTransferDto> phoneTransferConsumerFactory() {
+        return new DefaultKafkaConsumerFactory<String, PhoneTransferDto>(
+                baseConsumerProps(),
+                new StringDeserializer(),
+                jsonDeserializer(PhoneTransferDto.class)
+        );
+    }
+
+
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, AccountTransferDto>
+    accountTransferKafkaListenerContainerFactory(DefaultErrorHandler errorHandler) {
+        ConcurrentKafkaListenerContainerFactory<String, AccountTransferDto> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
-
-        configurer.configure(factory, consumerFactory);
-        factory.setCommonErrorHandler(new DefaultErrorHandler(new FixedBackOff(1000L, 2L)));
+        factory.setConsumerFactory(accountTransferConsumerFactory());
+        factory.setCommonErrorHandler(errorHandler);
         return factory;
     }
 
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, CardTransferDto>
+    cardTransferKafkaListenerContainerFactory(DefaultErrorHandler errorHandler) {
+        ConcurrentKafkaListenerContainerFactory<String, CardTransferDto> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(cardTransferConsumerFactory());
+        factory.setCommonErrorHandler(errorHandler);
+        return factory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, PhoneTransferDto>
+    phoneTransferKafkaListenerContainerFactory(DefaultErrorHandler errorHandler) {
+        ConcurrentKafkaListenerContainerFactory<String, PhoneTransferDto> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(phoneTransferConsumerFactory());
+        factory.setCommonErrorHandler(errorHandler);
+        return factory;
+    }
+    private Map<String, Object> baseConsumerProps() {
+        return kafkaProperties.buildConsumerProperties(sslBundles);
+    }
+
+    private <T> JsonDeserializer<T> jsonDeserializer(Class<T> clazz) {
+        JsonDeserializer<T> deserializer = new JsonDeserializer<>(clazz, false);
+        deserializer.addTrustedPackages("*");
+        return deserializer;
+    }
     @Bean
     public NewTopic accountTransferTopic() {
         return TopicBuilder.name(KafkaTopics.ACCOUNT_TRANSFER).partitions(1).replicas(1).build();
