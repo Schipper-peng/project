@@ -1,10 +1,10 @@
 package com.bank.antifraud.service.impl;
 
 import com.bank.antifraud.dto.audit.AuditDto;
+import com.bank.antifraud.dto.suspicious.SuspiciousAccountTransferDto;
+import com.bank.antifraud.dto.suspicious.SuspiciousCardTransferDto;
+import com.bank.antifraud.dto.suspicious.SuspiciousPhoneTransferDto;
 import com.bank.antifraud.entity.Audit;
-import com.bank.antifraud.entity.SuspiciousAccountTransfer;
-import com.bank.antifraud.entity.SuspiciousCardTransfer;
-import com.bank.antifraud.entity.SuspiciousPhoneTransfer;
 import com.bank.antifraud.enums.OperationType;
 import com.bank.antifraud.enums.TransferType;
 import com.bank.antifraud.mappers.AuditMapper;
@@ -28,13 +28,18 @@ public class AuditServiceImpl implements AuditService {
 
     @Override
     public AuditDto buildAudit(Object before, Object after, OperationType operationType) {
+        Instant now = Instant.now();
+
+        boolean isCreate = operationType == OperationType.CREATE;
+        boolean isUpdate = operationType == OperationType.UPDATE;
+
         return AuditDto.builder()
                 .entityType(resolveEntityType(before, after))
                 .operationType(operationType)
-                .createdBy("system")
-                .modifiedBy("system")
-                .createdAt(Instant.now())
-                .modifiedAt(Instant.now())
+                .createdBy(isCreate ? "system" : null)
+                .modifiedBy(isUpdate ? "system" : null)
+                .createdAt(isCreate ? now : null)
+                .modifiedAt(isUpdate ? now : null)
                 .entityJson(toJson(before))
                 .newEntityJson(toJson(after))
                 .build();
@@ -49,13 +54,13 @@ public class AuditServiceImpl implements AuditService {
     private TransferType resolveEntityType(Object before, Object after) {
         Object target = after != null ? after : before;
 
-        if (target instanceof SuspiciousAccountTransfer) {
+        if (target instanceof SuspiciousAccountTransferDto) {
             return TransferType.ACCOUNT;
         }
-        if (target instanceof SuspiciousCardTransfer) {
+        if (target instanceof SuspiciousCardTransferDto) {
             return TransferType.CARD;
         }
-        if (target instanceof SuspiciousPhoneTransfer) {
+        if (target instanceof SuspiciousPhoneTransferDto) {
             return TransferType.PHONE;
         }
         throw new IllegalArgumentException("Unsupported audit entity type: " + target);

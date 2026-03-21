@@ -2,6 +2,7 @@ package com.bank.antifraud.mappers;
 
 import com.bank.antifraud.dto.suspicious.SuspiciousCardTransferDto;
 import com.bank.antifraud.entity.SuspiciousCardTransfer;
+import com.bank.antifraud.enums.FraudReason;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,8 +17,8 @@ public class SuspiciousCardTransferMapper {
                 .cardTransferId(dto.getCardTransferId())
                 .isBlocked(dto.getIsBlocked())
                 .isSuspicious(dto.getIsSuspicious())
-                .blockedReason(dto.getBlockedReason())
-                .suspiciousReason(dto.getSuspiciousReason())
+                .blockedReason(dto.getBlockedReason() != null ? dto.getBlockedReason().name() : null)
+                .suspiciousReason(dto.getSuspiciousReason() != null ? dto.getSuspiciousReason().name() : null)
                 .build();
     }
 
@@ -30,8 +31,8 @@ public class SuspiciousCardTransferMapper {
                 entity.getCardTransferId(),
                 entity.getIsBlocked(),
                 entity.getIsSuspicious(),
-                entity.getBlockedReason(),
-                entity.getSuspiciousReason()
+                entity.getBlockedReason() != null ? FraudReason.valueOf(entity.getBlockedReason()) : null,
+                entity.getSuspiciousReason() != null ? FraudReason.valueOf(entity.getSuspiciousReason()) : null
         );
     }
 

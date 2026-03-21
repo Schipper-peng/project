@@ -7,16 +7,10 @@ import com.bank.antifraud.dto.transfer.PhoneTransferDto;
 import com.bank.antifraud.enums.FraudReason;
 import com.bank.antifraud.enums.TransferType;
 import com.bank.antifraud.service.TransferAnalyzer;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-@Slf4j
 @Service
-@Transactional
-@RequiredArgsConstructor
 public class TransferAnalyzerImpl implements TransferAnalyzer {
     private static final BigDecimal BLOCK_THRESHOLD = BigDecimal.valueOf(500_000);
     private static final BigDecimal SUSPICIOUS_THRESHOLD = BigDecimal.valueOf(100_000);

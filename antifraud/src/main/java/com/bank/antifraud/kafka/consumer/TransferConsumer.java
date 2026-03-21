@@ -42,7 +42,7 @@ public class TransferConsumer extends BaseKafkaSupport {
     @KafkaListener(topics = KafkaTopics.ACCOUNT_TRANSFER, groupId = "${spring.kafka.consumer.group-id}")
     public void handleAccount(String payload) {
         String corrId = UUID.randomUUID().toString();
-        AccountTransferDto dto = read(payload, AccountTransferDto.class);
+        AccountTransferDto dto = readJson(payload, AccountTransferDto.class);
 
         FraudDecisionDto decision = transferAnalyzer.analyzeAccount(dto);
 
@@ -70,7 +70,7 @@ public class TransferConsumer extends BaseKafkaSupport {
     @KafkaListener(topics = KafkaTopics.CARD_TRANSFER, groupId = "${spring.kafka.consumer.group-id}")
     public void handleCard(String payload) {
         String corrId = UUID.randomUUID().toString();
-        CardTransferDto dto = read(payload, CardTransferDto.class);
+        CardTransferDto dto = readJson(payload, CardTransferDto.class);
 
         FraudDecisionDto decision = transferAnalyzer.analyzeCard(dto);
 
@@ -98,7 +98,7 @@ public class TransferConsumer extends BaseKafkaSupport {
     @KafkaListener(topics = KafkaTopics.PHONE_TRANSFER, groupId = "${spring.kafka.consumer.group-id}")
     public void handlePhone(String payload) {
         String corrId = UUID.randomUUID().toString();
-        PhoneTransferDto dto = read(payload, PhoneTransferDto.class);
+        PhoneTransferDto dto = readJson(payload, PhoneTransferDto.class);
 
         FraudDecisionDto decision = transferAnalyzer.analyzePhone(dto);
 
@@ -123,11 +123,4 @@ public class TransferConsumer extends BaseKafkaSupport {
                 dto.getPhoneTransferId(), decision.isSuspicious());
     }
 
-    private <T> T read(String payload, Class<T> clazz) {
-        try {
-            return objectMapper.readValue(payload, clazz);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to read transfer payload", e);
-        }
-    }
 }
