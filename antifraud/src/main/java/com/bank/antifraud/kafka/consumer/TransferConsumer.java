@@ -8,12 +8,10 @@ import com.bank.antifraud.dto.transfer.AccountTransferDto;
 import com.bank.antifraud.dto.transfer.CardTransferDto;
 import com.bank.antifraud.dto.transfer.PhoneTransferDto;
 import com.bank.antifraud.enums.TransferType;
-import com.bank.antifraud.kafka.BaseKafkaSupport;
 import com.bank.antifraud.kafka.KafkaTopics;
 import com.bank.antifraud.kafka.producer.FraudDecisionProducer;
 import com.bank.antifraud.kafka.producer.SuspiciousTransferProducer;
 import com.bank.antifraud.service.TransferAnalyzer;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -30,19 +28,27 @@ public class TransferConsumer{
     private final FraudDecisionProducer fraudDecisionProducer;
 
 
-
     @KafkaListener(topics = KafkaTopics.ACCOUNT_TRANSFER,
             groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "accountTransferKafkaListenerContainerFactory"
     )
     public void handleAccount(AccountTransferDto dto) {
         String corrId = UUID.randomUUID().toString();
+        log.info("ACCOUNT dto before analyze: {}", dto);
 
         FraudDecisionDto decision = transferAnalyzer.analyzeAccount(dto);
 
         fraudDecisionProducer.sendDecision(decision, corrId);
-
+        log.info("Fraud decision after analyze: {}", decision);
         if (decision.isSuspicious()) {
+            log.info("Sending suspicious create: {}", new SuspiciousAccountTransferDto(
+                    null,
+                    decision.getTransferId(),
+                    decision.isBlocked(),
+                    decision.isSuspicious(),
+                    decision.getBlockedReason(),
+                    decision.getSuspiciousReason()
+            ));
             suspiciousTransferProducer.sendCreate(
                     new SuspiciousAccountTransferDto(
                             null,

@@ -1,13 +1,11 @@
 package com.bank.antifraud.kafka;
 
-import com.bank.antifraud.dto.suspicious.SuspiciousAccountTransferDto;
 import com.bank.antifraud.dto.transfer.AccountTransferDto;
 import com.bank.antifraud.dto.transfer.CardTransferDto;
 import com.bank.antifraud.dto.transfer.PhoneTransferDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.ssl.SslBundles;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +18,6 @@ import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Configuration

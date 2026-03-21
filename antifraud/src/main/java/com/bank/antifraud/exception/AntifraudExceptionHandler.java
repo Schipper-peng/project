@@ -14,7 +14,6 @@ import org.springframework.util.backoff.FixedBackOff;
 @EnableKafka
 public class AntifraudExceptionHandler {
 
-    @Bean
     public DefaultErrorHandler kafkaErrorHandler(KafkaTemplate<Object, Object> kafkaTemplate) {
         DeadLetterPublishingRecoverer recoverer =
                 new DeadLetterPublishingRecoverer(

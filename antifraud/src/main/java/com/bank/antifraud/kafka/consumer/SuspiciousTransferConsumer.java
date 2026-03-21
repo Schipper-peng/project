@@ -64,6 +64,7 @@ public class SuspiciousTransferConsumer extends BaseKafkaSupport {
             case ACCOUNT -> suspiciousTransferService.createAccount(readJson(payload, SuspiciousAccountTransferDto.class));
             case CARD -> suspiciousTransferService.createCard(readJson(payload, SuspiciousCardTransferDto.class));
             case PHONE -> suspiciousTransferService.createPhone(readJson(payload, SuspiciousPhoneTransferDto.class));
+
         }
     }
 
