@@ -17,8 +17,8 @@ public class SuspiciousAccountTransferMapper {
                 .accountTransferId(dto.getAccountTransferId())
                 .isBlocked(dto.getIsBlocked())
                 .isSuspicious(dto.getIsSuspicious())
-                .blockedReason(dto.getBlockedReason())
-                .suspiciousReason(dto.getSuspiciousReason())
+                .blockedReason(String.valueOf(dto.getBlockedReason()))
+                .suspiciousReason(String.valueOf(dto.getSuspiciousReason()))
                 .build();
     }
 

@@ -58,7 +58,7 @@ public class TransferConsumer extends BaseKafkaSupport {
                             decision.getBlockedReason(),
                             decision.getSuspiciousReason()
                     ),
-                    decision.getTransferType(),
+                    TransferType.ACCOUNT,
                     corrId
             );
         }
@@ -104,7 +104,7 @@ public class TransferConsumer extends BaseKafkaSupport {
 
         fraudDecisionProducer.sendDecision(decision, corrId);
 
-        if (decision.isSuspicious()) {
+        if (Boolean.TRUE.equals(decision.isSuspicious())) {
             suspiciousTransferProducer.sendCreate(
                     new SuspiciousPhoneTransferDto(
                             null,
@@ -125,7 +125,7 @@ public class TransferConsumer extends BaseKafkaSupport {
 
     private <T> T read(String payload, Class<T> clazz) {
         try {
-            return new com.fasterxml.jackson.databind.ObjectMapper().readValue(payload, clazz);
+            return objectMapper.readValue(payload, clazz);
         } catch (Exception e) {
             throw new RuntimeException("Failed to read transfer payload", e);
         }

@@ -40,7 +40,4 @@ public class SuspiciousCardTransfer {
     @Column(name = "suspicious_reason")
     private String suspiciousReason;
 
-    public SuspiciousCardTransfer(Long cardTransferId) {
-    }
-
 }

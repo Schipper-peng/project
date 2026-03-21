@@ -81,11 +81,7 @@ public class SuspiciousTransferServiceImpl implements SuspiciousTransferService 
         SuspiciousCardTransfer entity = cardRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("SuspiciousCardTransfer not found: " + dto.getId()));
 
-        entity.setCardTransferId(dto.getCardTransferId());
-        entity.setIsBlocked(dto.getIsBlocked());
-        entity.setIsSuspicious(dto.getIsSuspicious());
-        entity.setBlockedReason(dto.getBlockedReason());
-        entity.setSuspiciousReason(dto.getSuspiciousReason());
+        cardMapper.toEntity(dto, entity);
 
         return cardMapper.toDto(cardRepository.save(entity));
     }
