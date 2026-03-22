@@ -40,7 +40,7 @@ public class TransferConsumer{
 
         fraudDecisionProducer.sendDecision(decision, corrId);
         log.info("Fraud decision after analyze: {}", decision);
-        if (decision.isSuspicious()) {
+        if (Boolean.TRUE.equals(decision.isSuspicious()) || Boolean.TRUE.equals(decision.isBlocked())) {
             log.info("Sending suspicious create: {}", new SuspiciousAccountTransferDto(
                     null,
                     decision.getTransferId(),
@@ -78,7 +78,7 @@ public class TransferConsumer{
 
         fraudDecisionProducer.sendDecision(decision, corrId);
 
-        if (decision.isSuspicious()) {
+        if (Boolean.TRUE.equals(decision.isSuspicious()) || Boolean.TRUE.equals(decision.isBlocked())) {
             suspiciousTransferProducer.sendCreate(
                     new SuspiciousCardTransferDto(
                             null,
@@ -108,7 +108,7 @@ public class TransferConsumer{
 
         fraudDecisionProducer.sendDecision(decision, corrId);
 
-        if (decision.isSuspicious()) {
+        if (Boolean.TRUE.equals(decision.isSuspicious()) || Boolean.TRUE.equals(decision.isBlocked())) {
             suspiciousTransferProducer.sendCreate(
                     new SuspiciousPhoneTransferDto(
                             null,

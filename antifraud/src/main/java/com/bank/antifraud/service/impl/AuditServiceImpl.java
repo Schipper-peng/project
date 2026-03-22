@@ -50,6 +50,15 @@ public class AuditServiceImpl implements AuditService {
 
     @Override
     public void save(AuditDto auditDto) {
+        if (auditDto == null) {
+            throw new IllegalArgumentException("auditDto must not be null");
+        }
+        if (auditDto.getOperationType() == OperationType.CREATE && auditDto.getEntityJson() == null) {
+            auditDto.setEntityJson(
+                    auditDto.getNewEntityJson() != null ? auditDto.getNewEntityJson() : "{}"
+            );
+        }
+
         Audit audit = auditMapper.toEntity(auditDto);
         auditRepository.save(audit);
     }
