@@ -10,11 +10,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FraudDecisionDto {
+
     private Long transferId;
+
     private TransferType transferType;
+
     private boolean isBlocked;
+
     private boolean isSuspicious;
+
     private FraudReason blockedReason;
+
     private FraudReason suspiciousReason;
+
 
 }

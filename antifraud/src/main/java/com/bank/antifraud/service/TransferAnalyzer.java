@@ -9,8 +9,11 @@ import java.math.BigDecimal;
 
 public interface TransferAnalyzer {
     FraudDecisionDto analyzeAmount(BigDecimal amount);
+
     FraudDecisionDto analyzeAccount(AccountTransferDto dto);
+
     FraudDecisionDto analyzeCard(CardTransferDto dto);
+
     FraudDecisionDto analyzePhone(PhoneTransferDto dto);
 
 }

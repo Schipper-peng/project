@@ -42,4 +42,5 @@ public class FraudDecisionProducer extends BaseKafkaSupport {
         log.info("FraudDecision sent: transferId={}, transferType={}, suspicious={}",
                 dto.getTransferId(), dto.getTransferType(), dto.isSuspicious());
     }
+
 }

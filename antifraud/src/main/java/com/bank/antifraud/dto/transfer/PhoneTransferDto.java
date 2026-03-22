@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PhoneTransferDto {
+
     private Long phoneTransferId;
     private Long accountNumber;
     private BigDecimal amount;

@@ -10,6 +10,7 @@ import com.bank.antifraud.service.TransferAnalyzer;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+
 @Service
 public class TransferAnalyzerImpl implements TransferAnalyzer {
     private static final BigDecimal BLOCK_THRESHOLD = BigDecimal.valueOf(500_000);
@@ -76,4 +77,5 @@ public class TransferAnalyzerImpl implements TransferAnalyzer {
         decision.setTransferType(TransferType.PHONE);
         return decision;
     }
+
 }

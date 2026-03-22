@@ -8,7 +8,6 @@ import com.bank.antifraud.entity.SuspiciousAccountTransfer;
 import com.bank.antifraud.entity.SuspiciousCardTransfer;
 import com.bank.antifraud.entity.SuspiciousPhoneTransfer;
 import com.bank.antifraud.enums.OperationType;
-import com.bank.antifraud.kafka.producer.SuspiciousTransferProducer;
 import com.bank.antifraud.mappers.SuspiciousAccountTransferMapper;
 import com.bank.antifraud.mappers.SuspiciousCardTransferMapper;
 import com.bank.antifraud.mappers.SuspiciousPhoneTransferMapper;
@@ -138,4 +137,5 @@ public class SuspiciousTransferServiceImpl implements SuspiciousTransferService 
                 .orElseThrow(() -> new EntityNotFoundException(
                         "SuspiciousPhoneTransfer not found: " + id)));
     }
+
 }

@@ -8,6 +8,7 @@ import org.slf4j.MDC;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+
 public class BaseKafkaSupport {
     protected final ObjectMapper objectMapper;
 
@@ -60,4 +61,5 @@ public class BaseKafkaSupport {
             }
         }
     }
+
 }

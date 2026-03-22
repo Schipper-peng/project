@@ -91,4 +91,5 @@ public class AuditServiceImpl implements AuditService {
             throw new RuntimeException("Failed to serialize object for audit", e);
         }
     }
+
 }

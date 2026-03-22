@@ -86,6 +86,4 @@ public class AuditAspect {
         return target != null ? target.getClass().getSimpleName() : "audit";
     }
 
-
-
 }

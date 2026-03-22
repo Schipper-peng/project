@@ -24,3 +24,4 @@ public interface SuspiciousTransferService {
     SuspiciousPhoneTransferDto getPhone(Long id);
 
 }
+

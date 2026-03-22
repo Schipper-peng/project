@@ -22,7 +22,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TransferConsumer{
+public class TransferConsumer {
     private final TransferAnalyzer transferAnalyzer;
     private final SuspiciousTransferProducer suspiciousTransferProducer;
     private final FraudDecisionProducer fraudDecisionProducer;

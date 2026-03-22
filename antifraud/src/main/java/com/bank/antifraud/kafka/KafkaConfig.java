@@ -74,7 +74,6 @@ public class KafkaConfig {
     }
 
 
-
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, AccountTransferDto>
     accountTransferKafkaListenerContainerFactory(DefaultErrorHandler errorHandler) {
@@ -104,6 +103,7 @@ public class KafkaConfig {
         factory.setCommonErrorHandler(errorHandler);
         return factory;
     }
+
     private Map<String, Object> baseConsumerProps() {
         return kafkaProperties.buildConsumerProperties(sslBundles);
     }
@@ -113,6 +113,7 @@ public class KafkaConfig {
         deserializer.addTrustedPackages("*");
         return deserializer;
     }
+
     @Bean
     public NewTopic accountTransferTopic() {
         return TopicBuilder.name(KafkaTopics.ACCOUNT_TRANSFER).partitions(1).replicas(1).build();

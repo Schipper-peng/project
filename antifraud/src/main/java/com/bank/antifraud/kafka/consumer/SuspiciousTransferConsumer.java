@@ -61,7 +61,8 @@ public class SuspiciousTransferConsumer extends BaseKafkaSupport {
 
     private void handleCreate(String payload, TransferType transferType) {
         switch (transferType) {
-            case ACCOUNT -> suspiciousTransferService.createAccount(readJson(payload, SuspiciousAccountTransferDto.class));
+            case ACCOUNT ->
+                    suspiciousTransferService.createAccount(readJson(payload, SuspiciousAccountTransferDto.class));
             case CARD -> suspiciousTransferService.createCard(readJson(payload, SuspiciousCardTransferDto.class));
             case PHONE -> suspiciousTransferService.createPhone(readJson(payload, SuspiciousPhoneTransferDto.class));
 
@@ -70,7 +71,8 @@ public class SuspiciousTransferConsumer extends BaseKafkaSupport {
 
     private void handleUpdate(String payload, TransferType transferType) {
         switch (transferType) {
-            case ACCOUNT -> suspiciousTransferService.updateAccount(readJson(payload, SuspiciousAccountTransferDto.class));
+            case ACCOUNT ->
+                    suspiciousTransferService.updateAccount(readJson(payload, SuspiciousAccountTransferDto.class));
             case CARD -> suspiciousTransferService.updateCard(readJson(payload, SuspiciousCardTransferDto.class));
             case PHONE -> suspiciousTransferService.updatePhone(readJson(payload, SuspiciousPhoneTransferDto.class));
         }
